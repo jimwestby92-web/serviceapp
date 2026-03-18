@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jobboversikt</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      color: #222;
+      padding: 16px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #1a3a5c;
+      font-size: 1.6rem;
+    }
+
+    .container { max-width: 900px; margin: 0 auto; }
+
+    /* SKJEMA */
+    .skjema {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .skjema h2 { margin-bottom: 14px; color: #1a3a5c; font-size: 1rem; }
+
+    .rad {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .rad.en { grid-template-columns: 1fr; }
+
+    label { display: block; font-size: 0.82rem; font-weight: bold; margin-bottom: 3px; color: #555; }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-family: Arial, sans-serif;
+    }
+
+    input:focus, textarea:focus { outline: none; border-color: #1a3a5c; }
+    textarea { resize: vertical; min-height: 70px; }
+
+    .btn-legg-til {
+      width: 100%;
+      padding: 12px;
+      background: #1a3a5c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    .btn-legg-til:hover { background: #254d7a; }
+    .btn-legg-til:disabled { background: #aaa; cursor: not-allowed; }
+
+    /* FILTER */
+    .filter-rad {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 7px 16px;
+      border: 2px solid #1a3a5c;
+      border-radius: 20px;
+      background: white;
+      color: #1a3a5c;
+      cursor: pointer;
+      font-size: 0.88rem;
+    }
+
+    .filter-btn.aktiv { background: #1a3a5c; color: white; }
+
+    /* JOBBLISTE */
+    .jobb-liste { display: flex; flex-direction: column; gap: 10px; }
+
+    .jobb-kort {
+      background: white;
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      border-left: 5px solid #ccc;
+    }
+
+    .jobb-kort.ny    { border-left-color: #e67e22; }
+    .jobb-kort.pagar { border-left-color: #2980b9; }
+    .jobb-kort.full  { border-left-color: #27ae60; }
+
+    .jobb-topp {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .kundenavn { font-size: 1.05rem; font-weight: bold; color: #1a3a5c; }
+    .dato-tekst { font-size: 0.8rem; color: #888; }
+    .hva-tekst { font-weight: bold; margin-bottom: 3px; }
+    .hvor-tekst { font-size: 0.83rem; color: #666; margin-bottom: 4px; }
+    .besk-tekst { font-size: 0.88rem; color: #444; }
+
+    .jobb-bunn {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .badge {
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      font-weight: bold;
+    }
+
+    .badge-ny    { background: #fdebd0; color: #e67e22; }
+    .badge-pagar { background: #d6eaf8; color: #2980b9; }
+    .badge-full  { background: #d5f5e3; color: #27ae60; }
+
+    .knapper { display: flex; gap: 6px; }
+
+    .btn-status, .btn-slett {
+      padding: 6px 11px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .btn-status { background: #eaf0f6; color: #1a3a5c; }
+    .btn-status:hover { background: #d0dce8; }
+    .btn-slett  { background: #fdecea; color: #c0392b; }
+    .btn-slett:hover { background: #f5b7b1; }
+
+    .tom { text-align: center; color: #aaa; padding: 36px; }
+    .antall { font-size: 0.88rem; color: #888; margin-bottom: 10px; }
+
+    .melding {
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-bottom: 14px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .melding.feil    { background: #fdecea; color: #c0392b; display: block; }
+    .melding.ok      { background: #d5f5e3; color: #1e8449; display: block; }
+
+    @media (max-width: 500px) {
+      .rad { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Jobboversikt</h1>
+
+  <div id="melding" class="melding"></div>
+
+  <!-- SKJEMA -->
+  <div class="skjema">
+    <h2>Legg til ny jobb</h2>
+    <div class="rad">
+      <div>
+        <label>Kundenavn</label>
+        <input type="text" id="kundenavn" placeholder="Firma AS">
+      </div>
+      <div>
+        <label>Dato</label>
+        <input type="date" id="dato">
+      </div>
+    </div>
+    <div class="rad">
+      <div>
+        <label>Hva skal gjøres</label>
+        <input type="text" id="hva" placeholder="Service kjøleaggregat">
+      </div>
+      <div>
+        <label>Hvor (adresse)</label>
+        <input type="text" id="hvor" placeholder="Storgata 1, Oslo">
+      </div>
+    </div>
+    <div class="rad en">
+      <div>
+        <label>Beskrivelse</label>
+        <textarea id="beskrivelse" placeholder="Kort beskrivelse..."></textarea>
+      </div>
+    </div>
+    <button class="btn-legg-til" id="btn-legg-til" onclick="leggTilJobb()">+ Legg til jobb</button>
+  </div>
+
+  <!-- FILTER -->
+  <div class="filter-rad">
+    <button class="filter-btn aktiv" onclick="settFilter('alle', this)">Alle</button>
+    <button class="filter-btn" onclick="settFilter('Ny', this)">Nye</button>
+    <button class="filter-btn" onclick="settFilter('Pågår', this)">Pågår</button>
+    <button class="filter-btn" onclick="settFilter('Fullført', this)">Fullførte</button>
+  </div>
+
+  <div class="antall" id="antall"></div>
+  <div class="jobb-liste" id="jobb-liste"><div class="tom">Laster jobber...</div></div>
+</div>
+
+<script>
+  let aktivFilter = 'alle';
+  let alleJobber = [];
+
+  async function lastJobber() {
+    try {
+      const res = await fetch('/api/jobber');
+      alleJobber = await res.json();
+      visJobber();
+    } catch (e) {
+      visJobber();
+    }
+  }
+
+  async function leggTilJobb() {
+    const kundenavn = document.getElementById('kundenavn').value.trim();
+    const dato = document.getElementById('dato').value;
+    const hva = document.getElementById('hva').value.trim();
+    const hvor = document.getElementById('hvor').value.trim();
+    const beskrivelse = document.getElementById('beskrivelse').value.trim();
+
+    if (!kundenavn || !hva || !dato) {
+      visMelding('Fyll inn kundenavn, hva som skal gjøres og dato.', 'feil');
+      return;
+    }
+
+    const btn = document.getElementById('btn-legg-til');
+    btn.disabled = true;
+    btn.textContent = 'Lagrer...';
+
+    try {
+      const res = await fetch('/api/jobber', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kundenavn, hva, hvor, beskrivelse, dato })
+      });
+      if (!res.ok) throw new Error();
+      document.getElementById('kundenavn').value = '';
+      document.getElementById('dato').valueAsDate = new Date();
+      document.getElementById('hva').value = '';
+      document.getElementById('hvor').value = '';
+      document.getElementById('beskrivelse').value = '';
+      visMelding('Jobb lagt til!', 'ok');
+      await lastJobber();
+    } catch {
+      visMelding('Kunne ikke lagre jobb. Prøv igjen.', 'feil');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '+ Legg til jobb';
+    }
+  }
+
+  async function oppdaterStatus(id, nyStatus) {
+    try {
+      await fetch(`/api/jobber/${id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: nyStatus })
+      });
+      await lastJobber();
+    } catch {
+      visMelding('Kunne ikke oppdatere status.', 'feil');
+    }
+  }
+
+  async function slettJobb(id) {
+    if (!confirm('Slette denne jobben?')) return;
+    try {
+      await fetch(`/api/jobber/${id}`, { method: 'DELETE' });
+      await lastJobber();
+    } catch {
+      visMelding('Kunne ikke slette jobb.', 'feil');
+    }
+  }
+
+  function nesteStatus(status) {
+    if (status === 'Ny') return 'Pågår';
+    if (status === 'Pågår') return 'Fullført';
+    return 'Ny';
+  }
+
+  function statusKlasse(status) {
+    if (status === 'Ny') return 'ny';
+    if (status === 'Pågår') return 'pagar';
+    return 'full';
+  }
+
+  function badgeKlasse(status) {
+    if (status === 'Ny') return 'badge-ny';
+    if (status === 'Pågår') return 'badge-pagar';
+    return 'badge-full';
+  }
+
+  function knappTekst(status) {
+    if (status === 'Ny') return 'Start jobb';
+    if (status === 'Pågår') return 'Merk fullført';
+    return 'Tilbakestill';
+  }
+
+  function formaterDato(dato) {
+    if (!dato) return '';
+    const [år, mnd, dag] = dato.split('-');
+    return `${dag}.${mnd}.${år}`;
+  }
+
+  function settFilter(filter, knapp) {
+    aktivFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(k => k.classList.remove('aktiv'));
+    knapp.classList.add('aktiv');
+    visJobber();
+  }
+
+  function visJobber() {
+    const filtrerte = aktivFilter === 'alle'
+      ? alleJobber
+      : alleJobber.filter(j => j.status === aktivFilter);
+
+    document.getElementById('antall').textContent =
+      `Viser ${filtrerte.length} jobb${filtrerte.length !== 1 ? 'er' : ''}`;
+
+    const liste = document.getElementById('jobb-liste');
+
+    if (filtrerte.length === 0) {
+      liste.innerHTML = '<div class="tom">Ingen jobber å vise.</div>';
+      return;
+    }
+
+    liste.innerHTML = filtrerte.map(j => `
+      <div class="jobb-kort ${statusKlasse(j.status)}">
+        <div class="jobb-topp">
+          <div class="kundenavn">${j.kundenavn}</div>
+          <div class="dato-tekst">${formaterDato(j.dato)}</div>
+        </div>
+        <div class="hva-tekst">${j.hva}</div>
+        ${j.hvor ? `<div class="hvor-tekst">📍 ${j.hvor}</div>` : ''}
+        ${j.beskrivelse ? `<div class="besk-tekst">${j.beskrivelse}</div>` : ''}
+        <div class="jobb-bunn">
+          <span class="badge ${badgeKlasse(j.status)}">${j.status}</span>
+          <div class="knapper">
+            <button class="btn-status" onclick="oppdaterStatus(${j.id}, '${nesteStatus(j.status)}')">
+              ${knappTekst(j.status)}
+            </button>
+            <button class="btn-slett" onclick="slettJobb(${j.id})">Slett</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function visMelding(tekst, type) {
+    const el = document.getElementById('melding');
+    el.textContent = tekst;
+    el.className = `melding ${type}`;
+    setTimeout(() => el.className = 'melding', 3000);
+  }
+
+  // Oppdater automatisk hvert 30 sek
+  document.getElementById('dato').valueAsDate = new Date();
+  lastJobber();
+  setInterval(lastJobber, 30000);
+</script>
+</body>
+</html>
