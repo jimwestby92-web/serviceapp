@@ -14,10 +14,20 @@
       padding: 16px;
     }
 
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    header img {
+      max-height: 80px;
+      width: auto;
+    }
+
     h1 {
       text-align: center;
       margin-bottom: 20px;
-      color: #1a3a5c;
+      color: #2d7a3a;
       font-size: 1.6rem;
     }
 
@@ -32,7 +42,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
-    .skjema h2 { margin-bottom: 14px; color: #1a3a5c; font-size: 1rem; }
+    .skjema h2 { margin-bottom: 14px; color: #2d7a3a; font-size: 1rem; }
 
     .rad {
       display: grid;
@@ -54,13 +64,13 @@
       font-family: Arial, sans-serif;
     }
 
-    input:focus, textarea:focus { outline: none; border-color: #1a3a5c; }
+    input:focus, textarea:focus { outline: none; border-color: #2d7a3a; }
     textarea { resize: vertical; min-height: 70px; }
 
     .btn-legg-til {
       width: 100%;
       padding: 12px;
-      background: #1a3a5c;
+      background: #2d7a3a;
       color: white;
       border: none;
       border-radius: 6px;
@@ -82,15 +92,15 @@
 
     .filter-btn {
       padding: 7px 16px;
-      border: 2px solid #1a3a5c;
+      border: 2px solid #2d7a3a;
       border-radius: 20px;
       background: white;
-      color: #1a3a5c;
+      color: #2d7a3a;
       cursor: pointer;
       font-size: 0.88rem;
     }
 
-    .filter-btn.aktiv { background: #1a3a5c; color: white; }
+    .filter-btn.aktiv { background: #2d7a3a; color: white; }
 
     /* JOBBLISTE */
     .jobb-liste { display: flex; flex-direction: column; gap: 10px; }
@@ -114,7 +124,7 @@
       margin-bottom: 6px;
     }
 
-    .kundenavn { font-size: 1.05rem; font-weight: bold; color: #1a3a5c; }
+    .kundenavn { font-size: 1.05rem; font-weight: bold; color: #2d7a3a; }
     .dato-tekst { font-size: 0.8rem; color: #888; }
     .hva-tekst { font-weight: bold; margin-bottom: 3px; }
     .hvor-tekst { font-size: 0.83rem; color: #666; margin-bottom: 4px; }
@@ -150,7 +160,7 @@
       font-size: 0.8rem;
     }
 
-    .btn-status { background: #eaf0f6; color: #1a3a5c; }
+    .btn-status { background: #eaf0f6; color: #2d7a3a; }
     .btn-status:hover { background: #d0dce8; }
     .btn-slett  { background: #fdecea; color: #c0392b; }
     .btn-slett:hover { background: #f5b7b1; }
@@ -176,6 +186,9 @@
 </head>
 <body>
 <div class="container">
+  <header>
+    <img src="/logo.png" alt="Celsius Service AS">
+  </header>
   <h1>Jobboversikt</h1>
 
   <div id="melding" class="melding"></div>
